@@ -1,2 +1,0 @@
-# leevizero.github.io
-payeasymovil
