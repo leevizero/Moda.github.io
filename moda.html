@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moda Urbana | Retail Corporativo</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <style>
+        :root {
+            --urbana-red: #da0019; --urbana-blue: #0072ce; --urbana-dark: #222222; 
+            --urbana-light: #f4f4f4; --urbana-border: #dddddd; --urbana-green: #186f07;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Roboto', sans-serif; -webkit-font-smoothing: antialiased; }
+        body { background-color: #ffffff; color: var(--urbana-dark); padding-top: 155px; display: flex; flex-direction: column; min-height: 100vh;}
+        .container { width: 100%; max-width: 1280px; margin: 0 auto; padding: 0 20px; }
+        main { flex-grow: 1; }
+
+        /* HEADER Y BUSCADOR */
+        header { position: fixed; top: 0; left: 0; width: 100%; background-color: #ffffff; box-shadow: 0 2px 10px rgba(0,0,0,0.1); z-index: 1000; }
+        .top-utility-bar { background-color: var(--urbana-light); border-bottom: 1px solid var(--urbana-border); height: 30px; font-size: 11px; color: #666; display: flex; align-items: center; }
+        .top-utility-container { display: flex; justify-content: space-between; width: 100%; }
+        .main-header-bar { height: 70px; display: flex; align-items: center; justify-content: space-between; gap: 30px; }
+        .brand-logo-area { font-size: 26px; font-weight: 900; text-transform: uppercase; text-decoration: none; color: var(--urbana-dark); }
+        .brand-logo-area span { color: var(--urbana-red); }
+        .search-bar-container { flex-grow: 1; max-width: 600px; position: relative; display: flex; align-items: center; }
+        .search-bar-container input { width: 100%; padding: 12px 40px 12px 15px; border: 2px solid var(--urbana-blue); border-radius: 25px; font-size: 14px; outline: none; }
+        .header-actions-group { display: flex; align-items: center; gap: 20px; }
+        .action-icon-node { display: flex; flex-direction: column; align-items: center; font-size: 11px; font-weight: 700; color: var(--urbana-dark); background: none; border: none; cursor: pointer; position: relative;}
+        .badge-counter { position: absolute; top: -5px; right: 10px; background-color: var(--urbana-red); color: white; font-size: 10px; font-weight: 700; border-radius: 50%; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; }
+
+        /* MENÚ CATEGORÍAS */
+        .categories-nav-bar { background-color: var(--urbana-red); height: 45px; display: flex; align-items: center; color: white; }
+        .dropdown-menu { position: relative; display: inline-block; height: 100%; }
+        .btn-departamentos { background-color: #b30015; color: white; border: none; height: 45px; padding: 0 20px; font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 10px; cursor: pointer; text-transform: uppercase; }
+        .dropdown-content { display: none; position: absolute; background-color: #ffffff; min-width: 250px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); z-index: 1001; top: 45px; left: 0; }
+        .dropdown-content a { color: var(--urbana-dark); padding: 15px 20px; text-decoration: none; display: flex; align-items: center; gap: 15px; font-size: 14px; border-bottom: 1px solid var(--urbana-border); cursor: pointer;}
+        .dropdown-content a:hover { background-color: var(--urbana-light); color: var(--urbana-red); }
+        .dropdown-menu:hover .dropdown-content { display: block; }
+        .nav-links-wrapper { display: flex; gap: 25px; margin-left: 20px; }
+        .nav-link-item { font-size: 13px; font-weight: 500; color: white; text-decoration: none; cursor: pointer; }
+
+        /* GRILLA Y PRODUCTOS */
+        .catalog-main-layout { display: grid; grid-template-columns: 260px 1fr; gap: 30px; margin-top: 30px; margin-bottom: 80px; }
+        .sidebar-filters-box { border: 1px solid var(--urbana-border); border-radius: 4px; padding: 20px; align-self: start; }
+        .products-retail-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
+        .product-retail-card { border: 1px solid var(--urbana-border); border-radius: 4px; display: flex; flex-direction: column; padding-bottom: 15px; position: relative;}
+        .product-retail-card img { width: 100%; height: 260px; object-fit: cover; background: var(--urbana-light); }
+        .card-content-data { padding: 15px; display: flex; flex-direction: column; flex-grow: 1; justify-content: space-between;}
+        .btn-primary { width: 100%; background-color: var(--urbana-red); color: white; border: none; padding: 12px; font-weight: 700; border-radius: 4px; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
+        .btn-primary:hover { background-color: #b30015; }
+
+        /* DASHBOARDS Y VISTAS */
+        .view-section { display: none; }
+        .view-section.active { display: block; }
+        .dashboard-panel { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); margin-top: 20px; }
+        table.dash-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        table.dash-table th, table.dash-table td { padding: 12px; border-bottom: 1px solid #ddd; text-align: left; font-size: 14px; }
+        table.dash-table th { background: var(--urbana-dark); color: white; }
+        .dash-input { width: 80px; padding: 5px; }
+
+        /* FOOTER CORPORATIVO */
+        footer { background-color: var(--urbana-dark); color: #fff; padding: 60px 0 20px 0; margin-top: auto; }
+        .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 40px; margin-bottom: 40px; }
+        .footer-col h4 { font-size: 16px; font-weight: 900; margin-bottom: 20px; text-transform: uppercase; border-bottom: 2px solid var(--urbana-red); padding-bottom: 5px; display: inline-block;}
+        .footer-col a, .footer-col p { color: #bbb; text-decoration: none; font-size: 14px; margin-bottom: 12px; display: flex; align-items: center; gap: 10px;}
+        .footer-col a:hover { color: var(--urbana-red); cursor: pointer; }
+        .social-icons { display: flex; gap: 15px; margin-top: 10px; }
+        .social-icons a { background: #333; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+
+        /* MODALES */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.7); z-index: 3000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
+        .modal-overlay.active { display: flex; }
+        .modal-card { background: #fff; width: 100%; max-width: 440px; border-radius: 8px; overflow: hidden; }
+        .modal-header { padding: 20px; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; background: #fafafa; }
+        .form-input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; margin-bottom: 15px; }
+
+        /* CHECKOUT & CARRO */
+        .cart-slide-panel { position: fixed; top: 0; right: -400px; width: 100%; max-width: 400px; height: 100vh; background: #fff; z-index: 2000; box-shadow: -5px 0 25px rgba(0,0,0,0.15); transition: right 0.3s; display: flex; flex-direction: column; }
+        .cart-slide-panel.open { right: 0; }
+        .checkout-modal { max-width: 900px; display: grid; grid-template-columns: 1fr 320px; }
+        .step-container { display: none; }
+        .step-container.active { display: block; }
+        .radio-card { border: 2px solid #ccc; padding: 15px; border-radius: 6px; margin-bottom: 15px; cursor: pointer; display: flex; align-items: center; gap: 15px; }
+        .radio-card.selected { border-color: var(--urbana-blue); background: #f0f8ff; }
+        .spinner { border: 4px solid rgba(0,0,0,0.1); border-left-color: var(--urbana-blue); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto 20px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="top-utility-bar">
+            <div class="container top-utility-container">
+                <div>Envíos gratis por compras superiores a $50.000</div>
+                <div>Centro de Ayuda | Seguimiento en Línea</div>
+            </div>
+        </div>
+
+        <div class="container main-header-bar">
+            <a href="#" class="brand-logo-area" onclick="switchView('storeView'); clearAllFilters();">Moda<span>Urbana</span></a>
+            <div class="search-bar-container">
+                <input type="text" id="storeSearchInput" placeholder="¿Qué buscas hoy? Ej: Zapatillas, Poleras..." oninput="runStoreFilters()">
+            </div>
+
+            <div class="header-actions-group">
+                <div id="userLoggedZone" style="display:none; text-align:center;">
+                    <div style="font-size:12px; font-weight:700; color:var(--urbana-blue);">
+                        <i data-lucide="shield-check" style="width:16px; margin-bottom:2px;"></i><br>
+                        <span id="userNameDisplay">Usuario</span>
+                    </div>
+                    <div id="dashBtns" style="margin-top: 5px;"></div>
+                    <button class="action-icon-node" style="color:var(--urbana-red); margin-top:5px; margin-left:auto; margin-right:auto;" onclick="logout()">Salir</button>
+                </div>
+
+                <button id="btnLoginHeader" class="action-icon-node" onclick="openModal('authModal')">
+                    <i data-lucide="user" style="width: 24px; height: 24px;"></i> Inicia Sesión
+                </button>
+                
+                <button class="action-icon-node" onclick="document.getElementById('cartDrawerPanel').classList.add('open')">
+                    <i data-lucide="shopping-cart" style="width: 24px; height: 24px;"></i> Carro
+                    <span class="badge-counter" id="cartBadgeNode">0</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="categories-nav-bar">
+            <div class="container" style="display: flex; align-items: center; padding: 0;">
+                <div class="dropdown-menu">
+                    <button class="btn-departamentos"><i data-lucide="menu"></i> Menú de Categorías</button>
+                    <div class="dropdown-content">
+                        <a onclick="setQuickCategory('novedades')"><i data-lucide="zap"></i> Novedades</a>
+                        <a onclick="setQuickCategory('zapatillas')"><i data-lucide="footprints"></i> Zapatillas</a>
+                        <a onclick="setQuickCategory('poleras')"><i data-lucide="shirt"></i> Streetwear</a>
+                        <a onclick="clearAllFilters()"><i data-lucide="layout-grid"></i> Ver Todo</a>
+                    </div>
+                </div>
+                <div class="nav-links-wrapper">
+                    <span class="nav-link-item" onclick="setQuickCategory('novedades')">Novedades</span>
+                    <span class="nav-link-item" onclick="setQuickCategory('zapatillas')">Zapatillas</span>
+                    <span class="nav-link-item" onclick="setQuickCategory('poleras')">Streetwear</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        
+        <div id="storeView" class="view-section active">
+            <section style="background: linear-gradient(135deg, #111, #333); border-radius: 8px; padding: 40px; color: white; margin-top: 20px;">
+                <h1 style="font-size: 36px; font-weight: 900; color: var(--urbana-red);">Novedades Drop 04</h1>
+                <p>Chaquetas, hoodies y accesorios exclusivos para la cultura urbana.</p>
+            </section>
+
+            <div class="catalog-main-layout">
+                <aside class="sidebar-filters-box">
+                    <h3 style="font-weight: 900; margin-bottom: 20px;">FILTROS</h3>
+                    <div style="margin-bottom: 20px;">
+                        <div style="font-weight: 700; margin-bottom:10px; border-bottom:2px solid var(--urbana-red);">Marca</div>
+                        <label style="display:block; margin-bottom:8px; font-size:13px;"><input type="checkbox" value="nike" class="brand-chk" onchange="runStoreFilters()"> Nike</label>
+                        <label style="display:block; margin-bottom:8px; font-size:13px;"><input type="checkbox" value="adidas" class="brand-chk" onchange="runStoreFilters()"> Adidas</label>
+                        <label style="display:block; margin-bottom:8px; font-size:13px;"><input type="checkbox" value="urbana" class="brand-chk" onchange="runStoreFilters()"> Moda Urbana</label>
+                    </div>
+                    <div>
+                        <div style="font-weight: 700; margin-bottom:10px; border-bottom:2px solid var(--urbana-red);">Precio Máximo</div>
+                        <input type="number" id="priceLimitInput" placeholder="Ej: 50000" oninput="runStoreFilters()" style="width:100%; padding:10px; border:1px solid #ccc;">
+                    </div>
+                </aside>
+                <section class="products-retail-grid" id="productsDisplayGrid"></section>
+            </div>
+        </div>
+
+        <div id="workerDashboard" class="view-section dashboard-panel">
+            <h2 style="border-bottom:2px solid var(--urbana-blue); padding-bottom:10px; margin-bottom:20px;">
+                <i data-lucide="package"></i> Bodega: Precios y Stock
+            </h2>
+            <table class="dash-table" id="workerTable"></table>
+        </div>
+
+        <div id="adminDashboard" class="view-section dashboard-panel">
+            <h2 style="border-bottom:2px solid var(--urbana-red); padding-bottom:10px; margin-bottom:20px;">
+                <i data-lucide="layout-dashboard"></i> Panel de Control (Admin)
+            </h2>
+            <div style="display:flex; gap:20px; margin-bottom:30px;">
+                <div style="background:var(--urbana-light); padding:20px; border-radius:8px; flex:1; text-align:center; border:1px solid #ccc;">
+                    <h3>Total Ingresos Web</h3>
+                    <p style="font-size:32px; font-weight:900; color:var(--urbana-green);" id="adminTotalSales">$0</p>
+                </div>
+                <div style="background:var(--urbana-light); padding:20px; border-radius:8px; flex:1; text-align:center; border:1px solid #ccc;">
+                    <h3>Transacciones</h3>
+                    <p style="font-size:32px; font-weight:900; color:var(--urbana-blue);" id="adminNumTx">0</p>
+                </div>
+            </div>
+            <div style="display:flex; gap:30px;">
+                <div style="flex:2;">
+                    <h3><i data-lucide="file-text"></i> Últimas Ventas</h3>
+                    <table class="dash-table" id="adminTxTable"></table>
+                </div>
+                <div style="flex:1;">
+                    <h3 style="color:var(--urbana-red);"><i data-lucide="headset"></i> Reclamos / Call Center</h3>
+                    <table class="dash-table" id="adminComplaintsTable"></table>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer>
+        <div class="container footer-grid">
+            <div class="footer-col">
+                <h4>Atención al Cliente</h4>
+                <p><i data-lucide="map-pin"></i> Casa Matriz: Av. Providencia 1234, Piso 5, Santiago.</p>
+                <p><i data-lucide="phone"></i> +56 2 2345 6789</p>
+                <p><i data-lucide="mail"></i> contacto@modaurbana.cl</p>
+            </div>
+            <div class="footer-col">
+                <h4>Nuestra Empresa</h4>
+                <a href="#">Quiénes Somos</a>
+                <a href="#">Trabaja con Nosotros</a>
+                <a href="#">Términos y Condiciones</a>
+                <a href="#">Políticas de Privacidad</a>
+                <a onclick="openModal('authModal')" style="color:var(--urbana-blue); font-weight:bold; margin-top:15px;">
+                    <i data-lucide="lock" style="width:16px;"></i> Portal Trabajadores (Intranet)
+                </a>
+            </div>
+            <div class="footer-col">
+                <h4>Síguenos</h4>
+                <div class="social-icons">
+                    <a href="https://wa.me/56912345678"><i data-lucide="message-circle"></i></a>
+                    <a href="https://instagram.com"><i data-lucide="instagram"></i></a>
+                    <a href="https://facebook.com"><i data-lucide="facebook"></i></a>
+                    <a href="https://twitter.com"><i data-lucide="twitter"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <div class="modal-overlay" id="authModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2 style="font-size: 16px; font-weight: 900;">INICIAR SESIÓN</h2>
+                <button style="background:none; border:none; cursor:pointer;" onclick="closeModal('authModal')"><i data-lucide="x"></i></button>
+            </div>
+            <div style="padding:24px;">
+                <form onsubmit="handleLogin(event)">
+                    <input type="email" id="loginEmail" required placeholder="Correo Electrónico" class="form-input">
+                    <input type="password" id="loginPwd" required placeholder="Contraseña" class="form-input">
+                    <button type="submit" class="btn-primary" style="background: var(--urbana-blue);">Ingresar Seguro</button>
+                </form>
+                <div style="font-size:11px; color:#666; margin-top:15px; border-top:1px solid #eee; padding-top:15px;">
+                    <b>Cuentas de Prueba:</b><br>
+                    Cliente: cliente@gmail.com / pwd: 123<br>
+                    Bodega: staff@modaurbana.cl / pwd: 123<br>
+                    Admin: admin@modaurbana.cl / pwd: 123
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="cart-slide-panel" id="cartDrawerPanel">
+        <div style="padding:20px; border-bottom:1px solid #ddd; display:flex; justify-content:space-between; background:var(--urbana-light);">
+            <h2 style="font-size:16px; font-weight:900;">TU CARRO</h2>
+            <button style="background:none; border:none; cursor:pointer;" onclick="document.getElementById('cartDrawerPanel').classList.remove('open')"><i data-lucide="x"></i></button>
+        </div>
+        <div id="cartItemsList" style="flex-grow:1; overflow-y:auto; padding:20px;"></div>
+        <div style="padding:20px; border-top:1px solid #ddd;">
+            <div style="display:flex; justify-content:space-between; font-weight:900; font-size:18px; margin-bottom:15px;">
+                <span>Total:</span><span id="cartTotalPrice">$0</span>
+            </div>
+            <button class="btn-primary" onclick="initCheckout()">Ir a Pagar</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="checkoutModal">
+        <div class="modal-card checkout-modal" style="background:#fff;">
+            <div style="padding:30px; border-right:1px solid #ddd;">
+                <h2 style="font-size:22px; font-weight:900; margin-bottom:20px; border-bottom:2px solid var(--urbana-red);">CHECKOUT SEGURO</h2>
+                
+                <div id="step-1" class="step-container active">
+                    <h3 style="font-size:16px; margin-bottom:15px;">1. Despacho</h3>
+                    <label class="radio-card selected"><input type="radio" checked> Envío a Domicilio</label>
+                    <input type="text" class="form-input" placeholder="Dirección completa">
+                    <label style="display:flex; align-items:center; gap:10px; margin-top:15px; cursor:pointer;">
+                        <input type="checkbox" id="reqTicket" style="width:16px;height:16px;"> Solicitar Ticket de Cambio
+                    </label>
+                    <button class="btn-primary" style="margin-top:20px;" onclick="goToStep(2)">Continuar</button>
+                </div>
+
+                <div id="step-2" class="step-container">
+                    <h3 style="font-size:16px; margin-bottom:15px;">2. Medio de Pago</h3>
+                    <label class="radio-card selected"><input type="radio" checked> Webpay Plus</label>
+                    <button class="btn-primary" onclick="goToStep(3)">Pagar Ahora</button>
+                </div>
+
+                <div id="step-3" class="step-container" style="text-align:center; padding:50px 0;">
+                    <div class="spinner"></div>
+                    <h3 style="font-size:20px;">Conectando con el Banco...</h3>
+                </div>
+
+                <div id="step-4" class="step-container" style="text-align:center;">
+                    <i data-lucide="check-circle" style="color:green; width:60px; height:60px;"></i>
+                    <h2 style="font-size:24px; color:green; margin:15px 0;">¡PAGO EXITOSO!</h2>
+                    <button class="btn-primary" style="margin-bottom:10px; background:var(--urbana-dark);" onclick="descargarPDF()"><i data-lucide="file-down"></i> Descargar Boleta PDF</button>
+                    <button class="btn-primary" style="background:#ccc; color:#333;" onclick="closeCheckout()">Finalizar Compra</button>
+                </div>
+            </div>
+            
+            <div style="padding:30px; background:var(--urbana-light);">
+                <h3 style="font-size:14px; font-weight:900; border-bottom:1px solid #ccc; padding-bottom:10px; margin-bottom:15px;">RESUMEN</h3>
+                <div id="checkoutSummaryList" style="font-size:13px; margin-bottom:20px;"></div>
+                <div style="border-top:2px solid #222; padding-top:15px; display:flex; justify-content:space-between; font-weight:900; font-size:22px; color:var(--urbana-red);">
+                    <span>TOTAL:</span><span id="chkTotal">$0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="pdfWrapper" style="position: absolute; left: -9999px; top: -9999px; width: 800px; background: white; padding: 50px; color: #333;">
+        <div style="display: flex; justify-content: space-between; border-bottom: 3px solid #222; padding-bottom: 25px; margin-bottom: 30px;">
+            <div>
+                <h1 style="color:var(--urbana-red); font-weight:900; font-size:32px;">MODA URBANA</h1>
+                <p>RUT: 76.543.210-K | Av. Providencia 1234, Stgo</p>
+                <p>Venta al por menor de prendas de vestir</p>
+            </div>
+            <div style="text-align:right;">
+                <div style="background:var(--urbana-red); color:white; padding:8px 15px; border-radius:4px; font-size:18px; font-weight:900;">BOLETA ELECTRÓNICA</div>
+                <p style="margin-top:10px;">Folio N°: <span id="pdfFolio">0000</span></p>
+                <p>Fecha: <span id="pdfDate"></span></p>
+            </div>
+        </div>
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px;">
+            <tr style="background:#222; color:white; text-align:left;"><th style="padding:12px;">Cant</th><th>Descripción</th><th style="text-align:right; padding:12px;">Total</th></tr>
+            <tbody id="pdfItems"></tbody>
+        </table>
+        <h2 style="text-align:right; font-size:24px;">TOTAL: <span id="pdfTotalInfo"></span></h2>
+        
+        <div style="border: 2px solid #da0019; padding: 15px; text-align: center; width: 320px; margin: 40px auto; border-radius: 4px;">
+            <p style="color:#da0019; font-weight:900;">TIMBRE ELECTRÓNICO SII</p>
+            <div style="height: 60px; width: 100%; background: repeating-linear-gradient(90deg, #000, #000 2px, #fff 2px, #fff 4px); margin: 15px 0;"></div>
+            <p style="font-size:11px; color:#da0019;">Res. 80 de 2014 - Verifique en www.sii.cl</p>
+        </div>
+
+        <div id="pdfTicketCambio" style="display:none; margin-top:50px; border-top:2px dashed #999; padding-top:50px; page-break-before:always;">
+            <h2 style="text-align:center; font-size:24px; font-weight:900; margin-bottom:20px;">TICKET DE CAMBIO</h2>
+            <p style="text-align:center; margin-bottom:20px;">Válido hasta: <span id="pdfDateTicket"></span> | Boleta Asociada: <span id="pdfFolioTicket"></span></p>
+            <table style="width: 100%; border-collapse: collapse;">
+                <tr style="background:#eee; text-align:left;"><th style="padding:12px;">Cant</th><th>Descripción</th></tr>
+                <tbody id="pdfItemsTicket"></tbody>
+            </table>
+            <p style="text-align:center; font-size:12px; margin-top:30px;">* El producto debe estar con sus etiquetas y sin uso.</p>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        // 1. INICIALIZAR BASE DE DATOS LOCAL
+        function initDB() {
+            if(!localStorage.getItem('mu_users')) {
+                localStorage.setItem('mu_users', JSON.stringify([
+                    { email: 'cliente@gmail.com', pwd: '123', role: 'client', name: 'Cliente Común' },
+                    { email: 'staff@modaurbana.cl', pwd: '123', role: 'worker', name: 'Gestor Bodega' },
+                    { email: 'admin@modaurbana.cl', pwd: '123', role: 'admin', name: 'Gerente General' }
+                ]));
+            }
+            if(!localStorage.getItem('mu_products')) {
+                localStorage.setItem('mu_products', JSON.stringify([
+                    { id: 1, brand: "Nike", name: "Sneakers Air Max 90", category: "zapatillas", priceOffer: 89990, priceNormal: 109990, stock: 15, img: "https://images.unsplash.com/photo-1605348532760-6753d2c43329?q=80&w=400", isNew: true },
+                    { id: 2, brand: "Moda Urbana", name: "Oversized Hoodie", category: "poleras", priceOffer: 34990, priceNormal: 45990, stock: 30, img: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=400", isNew: false },
+                    { id: 3, brand: "Adidas Originals", name: "Forum Low", category: "zapatillas", priceOffer: 74990, priceNormal: 84990, stock: 12, img: "https://images.unsplash.com/photo-1515955656352-a1fa3ffcd111?q=80&w=400", isNew: true },
+                    { id: 4, brand: "Moda Urbana", name: "Cargo Pants", category: "poleras", priceOffer: 39990, priceNormal: 59990, stock: 20, img: "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?q=80&w=400", isNew: true }
+                ]));
+            }
+            if(!localStorage.getItem('mu_transactions')) localStorage.setItem('mu_transactions', JSON.stringify([]));
+            if(!localStorage.getItem('mu_complaints')) {
+                localStorage.setItem('mu_complaints', JSON.stringify([
+                    { id: 101, client: 'Juan P.', issue: 'Retraso de envío', status: 'Pendiente' },
+                    { id: 102, client: 'Maria L.', issue: 'Talla incorrecta', status: 'Resuelto' }
+                ]));
+            }
+        }
+        initDB();
+
+        // Utilidades DB
+        const getDB = (key) => JSON.parse(localStorage.getItem(key));
+        const setDB = (key, data) => localStorage.setItem(key, JSON.stringify(data));
+
+        // Variables de Estado
+        let currentUser = getDB('mu_currentUser') || null;
+        let cartData = [];
+        let finalCartTotal = 0;
+        let currentFilterCategory = "";
+        let generatedFolio = 0;
+
+        // 2. GESTIÓN DE SESIÓN Y VISTAS (RBAC)
+        function checkAuth() {
+            document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
+            const userZone = document.getElementById('userLoggedZone');
+            const loginBtn = document.getElementById('btnLoginHeader');
+            const dashBtns = document.getElementById('dashBtns');
+
+            if(currentUser) {
+                loginBtn.style.display = 'none';
+                userZone.style.display = 'block';
+                document.getElementById('userNameDisplay').innerText = currentUser.name.split(' ')[0];
+                
+                dashBtns.innerHTML = '';
+                if(currentUser.role === 'admin') {
+                    dashBtns.innerHTML = `<button class="action-icon-node" style="margin:0 auto;" onclick="switchView('adminDashboard')">Panel Admin</button>`;
+                    renderAdminDashboard();
+                    switchView('adminDashboard');
+                } else if(currentUser.role === 'worker') {
+                    dashBtns.innerHTML = `<button class="action-icon-node" style="margin:0 auto;" onclick="switchView('workerDashboard')">Bodega</button>`;
+                    renderWorkerDashboard();
+                    switchView('workerDashboard');
+                } else {
+                    switchView('storeView');
+                }
+            } else {
+                loginBtn.style.display = 'flex';
+                userZone.style.display = 'none';
+                switchView('storeView');
+            }
+            runStoreFilters();
+        }
+
+        function switchView(viewId) {
+            document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+            if(viewId === 'storeView') runStoreFilters();
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const pwd = document.getElementById('loginPwd').value;
+            const users = getDB('mu_users');
+            const user = users.find(u => u.email === email && u.pwd === pwd);
+            
+            if(user) {
+                setDB('mu_currentUser', user);
+                currentUser = user;
+                closeModal('authModal');
+                checkAuth();
+                
+                // Si venía del checkout
+                if(document.getElementById('checkoutModal').classList.contains('pending-login')){
+                    document.getElementById('checkoutModal').classList.remove('pending-login');
+                    initCheckout();
+                }
+            } else {
+                alert("Credenciales incorrectas.");
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('mu_currentUser');
+            currentUser = null;
+            checkAuth();
+        }
+
+        function openModal(id) { document.getElementById(id).classList.add('active'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+        // 3. LÓGICA DE TIENDA PÚBLICA
+        function setQuickCategory(cat) { currentFilterCategory = cat; runStoreFilters(); switchView('storeView'); }
+        function clearAllFilters() { currentFilterCategory = ""; document.getElementById("storeSearchInput").value = ""; document.querySelectorAll('.brand-chk').forEach(cb => cb.checked = false); document.getElementById("priceLimitInput").value = ""; runStoreFilters(); }
+
+        function runStoreFilters() {
+            if(document.getElementById('storeView').classList.contains('active') === false) return;
+            
+            const products = getDB('mu_products');
+            const grid = document.getElementById("productsDisplayGrid");
+            const q = document.getElementById("storeSearchInput").value.toLowerCase();
+            const pMax = parseInt(document.getElementById("priceLimitInput").value) || Infinity;
+            const activeBrands = Array.from(document.querySelectorAll('.brand-chk:checked')).map(cb => cb.value);
+
+            const filtered = products.filter(p => {
+                if(p.stock <= 0) return false;
+                const mQuery = q==="" || p.name.toLowerCase().includes(q);
+                const mPrice = p.priceOffer <= pMax;
+                const mBrand = activeBrands.length === 0 || activeBrands.includes(p.brand.toLowerCase()) || (activeBrands.includes('urbana') && p.brand === 'Moda Urbana');
+                const mCat = currentFilterCategory==="" || (currentFilterCategory==='novedades'?p.isNew:p.category===currentFilterCategory);
+                return mQuery && mPrice && mBrand && mCat;
+            });
+
+            grid.innerHTML = filtered.length ? filtered.map(p => `
+                <div class="product-retail-card">
+                    <img src="${p.img}">
+                    <div class="card-content-data">
+                        <small style="color:#666; font-weight:700;">${p.brand}</small>
+                        <h4 style="font-size:14px; margin:5px 0;">${p.name}</h4>
+                        <div style="color:var(--urbana-red); font-size:18px; font-weight:900;">$${p.priceOffer.toLocaleString('es-CL')}</div>
+                        <div style="font-size:11px; color:#888;">Stock: ${p.stock}</div>
+                        <button class="btn-primary" style="margin-top:10px;" onclick="addToCart(${p.id})">Añadir al Carro</button>
+                    </div>
+                </div>
+            `).join('') : "<p style='grid-column:1/-1; text-align:center; padding:40px;'>No hay productos.</p>";
+        }
+
+        // 4. CARRITO Y CHECKOUT
+        function addToCart(id) {
+            const products = getDB('mu_products');
+            const item = products.find(p => p.id === id);
+            const exists = cartData.find(c => c.product.id === id);
+            if(exists) { if(exists.quantity < item.stock) exists.quantity++; else alert("Sin más stock."); }
+            else cartData.push({ product: item, quantity: 1 });
+            updateCart();
+            document.getElementById('cartDrawerPanel').classList.add('open');
+        }
+
+        function removeCartItem(id) { cartData = cartData.filter(i => i.product.id !== id); updateCart(); }
+
+        function updateCart() {
+            finalCartTotal = cartData.reduce((s, i) => s + (i.product.priceOffer * i.quantity), 0);
+            document.getElementById("cartBadgeNode").innerText = cartData.reduce((s, i) => s + i.quantity, 0);
+            document.getElementById("cartTotalPrice").innerText = `$${finalCartTotal.toLocaleString('es-CL')}`;
+            document.getElementById("cartItemsList").innerHTML = cartData.map(i => `
+                <div style="display:flex; gap:10px; margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">
+                    <img src="${i.product.img}" style="width:60px; height:60px; object-fit:cover;">
+                    <div style="flex:1;">
+                        <b>${i.product.name}</b><br><small>Cant: ${i.quantity}</small><br>
+                        <span style="color:var(--urbana-red); font-weight:bold;">$${(i.product.priceOffer * i.quantity).toLocaleString('es-CL')}</span>
+                        <button style="border:none;background:none;color:red;float:right;cursor:pointer;" onclick="removeCartItem(${i.product.id})">X</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function initCheckout() {
+            if(cartData.length === 0) return alert("Carro vacío");
+            if(!currentUser) { document.getElementById('checkoutModal').classList.add('pending-login'); openModal('authModal'); return; }
+            document.getElementById('cartDrawerPanel').classList.remove('open');
+            document.getElementById("checkoutSummaryList").innerHTML = cartData.map(i => `<div>${i.quantity}x ${i.product.name}</div>`).join('');
+            document.getElementById("chkTotal").innerText = `$${finalCartTotal.toLocaleString('es-CL')}`;
+            goToStep(1); openModal('checkoutModal');
+        }
+
+        function goToStep(n) {
+            document.querySelectorAll('.step-container').forEach(e => e.classList.remove('active'));
+            document.getElementById('step-'+n).classList.add('active');
+            if(n === 3) {
+                generatedFolio = Math.floor(1000000 + Math.random() * 9000000);
+                setTimeout(() => { processPayment(); goToStep(4); }, 2000);
+            }
+        }
+
+        function processPayment() {
+            // 1. Guardar Transacción
+            const txs = getDB('mu_transactions');
+            txs.push({ folio: generatedFolio, date: new Date().toLocaleString(), total: finalCartTotal, client: currentUser.email });
+            setDB('mu_transactions', txs);
+
+            // 2. Descontar Stock
+            const prods = getDB('mu_products');
+            cartData.forEach(cartItem => {
+                const p = prods.find(x => x.id === cartItem.product.id);
+                if(p) p.stock -= cartItem.quantity;
+            });
+            setDB('mu_products', prods);
+
+            // 3. Preparar PDF
+            const dateStr = new Date().toLocaleString('es-CL');
+            document.getElementById('pdfFolio').innerText = generatedFolio;
+            document.getElementById('pdfDate').innerText = dateStr;
+            document.getElementById('pdfTotalInfo').innerText = `$${finalCartTotal.toLocaleString('es-CL')}`;
+            document.getElementById('pdfItems').innerHTML = cartData.map(i => `<tr><td style="padding:12px;">${i.quantity}</td><td>${i.product.name}</td><td style="text-align:right;">$${(i.product.priceOffer * i.quantity).toLocaleString('es-CL')}</td></tr>`).join('');
+            
+            if(document.getElementById('reqTicket').checked) {
+                let fCambio = new Date(); fCambio.setDate(fCambio.getDate()+30);
+                document.getElementById('pdfDateTicket').innerText = fCambio.toLocaleDateString();
+                document.getElementById('pdfFolioTicket').innerText = generatedFolio;
+                document.getElementById('pdfItemsTicket').innerHTML = cartData.map(i => `<tr><td style="padding:12px;">${i.quantity}</td><td>${i.product.name}</td></tr>`).join('');
+                document.getElementById('pdfTicketCambio').style.display = 'block';
+            } else {
+                document.getElementById('pdfTicketCambio').style.display = 'none';
+            }
+        }
+
+        function descargarPDF() {
+            const el = document.getElementById('pdfWrapper');
+            el.style.left = '0'; el.style.top = '0'; el.style.position = 'relative';
+            html2pdf().set({margin:10, filename:'Boleta_'+generatedFolio+'.pdf'}).from(el).save().then(() => {
+                el.style.left = '-9999px'; el.style.position = 'absolute';
+            });
+        }
+
+        function closeCheckout() { closeModal('checkoutModal'); cartData = []; updateCart(); checkAuth(); }
+
+        // 5. LÓGICA DE TRABAJADOR Y ADMIN
+        function renderWorkerDashboard() {
+            const prods = getDB('mu_products');
+            const tb = document.getElementById('workerTable');
+            tb.innerHTML = `<tr><th>ID</th><th>Producto</th><th>Precio Oferta ($)</th><th>Stock</th><th></th></tr>` + prods.map(p => `
+                <tr>
+                    <td>${p.id}</td><td><b>${p.name}</b></td>
+                    <td><input type="number" id="w_price_${p.id}" value="${p.priceOffer}" class="dash-input" style="width:100px;"></td>
+                    <td><input type="number" id="w_stock_${p.id}" value="${p.stock}" class="dash-input"></td>
+                    <td><button class="btn-primary" style="padding:5px 10px; background:var(--urbana-blue); font-size:11px;" onclick="updateProduct(${p.id})">Guardar</button></td>
+                </tr>
+            `).join('');
+        }
+
+        function updateProduct(id) {
+            const price = parseInt(document.getElementById('w_price_'+id).value);
+            const stock = parseInt(document.getElementById('w_stock_'+id).value);
+            const prods = getDB('mu_products');
+            const idx = prods.findIndex(p => p.id === id);
+            if(idx > -1) { prods[idx].priceOffer = price; prods[idx].stock = stock; setDB('mu_products', prods); alert("Actualizado con éxito."); }
+        }
+
+        function renderAdminDashboard() {
+            const txs = getDB('mu_transactions');
+            const comps = getDB('mu_complaints');
+            
+            document.getElementById('adminTotalSales').innerText = '$' + txs.reduce((s, t) => s + t.total, 0).toLocaleString('es-CL');
+            document.getElementById('adminNumTx').innerText = txs.length;
+
+            document.getElementById('adminTxTable').innerHTML = `<tr><th>Folio</th><th>Fecha</th><th>Cliente</th><th>Monto</th></tr>` + 
+                [...txs].reverse().map(t => `<tr><td>#${t.folio}</td><td>${t.date}</td><td>${t.client}</td><td><b>$${t.total.toLocaleString()}</b></td></tr>`).join('');
+            
+            document.getElementById('adminComplaintsTable').innerHTML = `<tr><th>Cliente/Asunto</th><th>Estado</th></tr>` + 
+                comps.map(c => `<tr><td><b>${c.client}</b><br><small>${c.issue}</small></td><td><span style="color:${c.status==='Resuelto'?'green':'red'}; font-weight:bold;">${c.status}</span></td></tr>`).join('');
+        }
+
+        // Arrancar App
+        checkAuth();
+    </script>
+</body>
+</html>
